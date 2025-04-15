@@ -352,22 +352,22 @@ public final class RobotConstants {
                 public static final double MAX_SPEED_PERCENT = 1; // ex: 0.4 -> 40%
         }
 
-        public static final class PathPlannerConstants { // TODO pathplanner speeds for autonomous
-                public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
+        public static final class PathPlannerConstants {
+                // public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
 
                 public static final double kMaxAngularAcceleration = 4 * Math.PI;
                 public static final double kMaxAccelerationMetersPerSecondSquared = 3.00;
 
                 public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(
-                                DrivetrainConstants.MAX_SPEED_METERS_PER_SECOND,
-                                PathPlannerConstants.kMaxAccelerationMetersPerSecondSquared,
-                                DrivetrainConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                                5 * Math.PI);
+                                .3,
+                                .3,
+                                .2,
+                                2 * Math.PI);
 
-                public static final double MAX_VELOCITY = 1.0; // Meters per second
-                public static final double MAX_ACCELERATION = 1.0; // Meters per second squared
-                public static final double MAX_ANGULAR_SPEED = 46.0; // Degrees per second
-                public static final double MAX_ANGULAR_ACCELERATION = 90.0; // Degrees per second squared
+                public static final double MAX_VELOCITY = 6.0; // Meters per second
+                public static final double MAX_ACCELERATION = 6.0; // Meters per second squared
+                public static final double MAX_ANGULAR_SPEED = 540.0; // Degrees per second
+                public static final double MAX_ANGULAR_ACCELERATION = 720.0; // Degrees per second squared
         }
 
         public static final class SubsystemEnabledConstants {

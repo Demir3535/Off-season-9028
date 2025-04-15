@@ -35,6 +35,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.utils.SwerveUtils;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -165,17 +166,17 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // Configure AutoBuilder last
-        AutoBuilder.configure(
-                DriveSubsystem::getPose, // Robot pose supplier
+         AutoBuilder.configure(
+                this::getPose, // Robot pose supplier
                 this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds) -> pathFollowDrive(speeds), // Method that will drive the robot given ROBOT RELATIVE
-                                                     // ChassisSpeeds. Also optionally outputs individual module
-                                                     // feedforwards
+                (speeds) -> runChassisSpeeds(speeds, false), // Method that will drive the robot given ROBOT RELATIVE
+                                                             // ChassisSpeeds. Also optionally outputs individual module
+                                                             // feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
                                                 // holonomic drive trains
-                        new PIDConstants(5.0, 0.0, 0), // Translation PID constants  //TODO PID IMPORTANT VALUES FOR PATHPLANNER
-                        new PIDConstants(0.05, 0.0, 0) // Rotation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
                 ),
                 config, // The robot configuration
                 () -> {
@@ -192,6 +193,8 @@ public class DriveSubsystem extends SubsystemBase {
                 },
                 this // Reference to this subsystem to set requirements
         );
+        PathfindingCommand.warmupCommand().schedule();
+
     }
 
     private double getGyroAngle() {
@@ -293,7 +296,7 @@ public class DriveSubsystem extends SubsystemBase {
         RobotState.updatePose(m_odometry.getEstimatedPosition());
     }
 
-    public static Pose2d getPose() {
+    public  Pose2d getPose() {
         return SubsystemEnabledConstants.DRIVE_SUBSYSTEM_ENABLED ? m_odometry.getEstimatedPosition() : new Pose2d();
     }
 
@@ -705,11 +708,15 @@ public class DriveSubsystem extends SubsystemBase {
             // init
             if (RobotBase.isReal()) {
                 zeroHeading();
+            } else {
+                fakeGyro = 0;
             }
         }, () -> {
             // end
         });
     }
+
+    
 
     public Command xCommand() {
         return Commands.startEnd(() -> {

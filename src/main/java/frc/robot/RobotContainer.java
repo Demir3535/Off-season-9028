@@ -234,12 +234,11 @@ public class RobotContainer {
 
         public Command getAutonomousCommand() {
                 if (m_autoPositionChooser.getSelected() != null) {
-                        return new PathPlannerAuto("test2");
+                        return m_autoPositionChooser.getSelected();
                 } else {
                         return m_drive.gyroReset();
                 }
         }
-
         public Command getTestingCommand() {
                 return new RobotSystemsCheckCommand(m_drive);
         }
