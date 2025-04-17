@@ -7,13 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "left middle "
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "test"
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "reef to procesor"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "procesor to reef"
           }
         }
       ]

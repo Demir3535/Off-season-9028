@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L3 sağ çap"
+            "pathName": null
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "sağ çap soruce"
+            "pathName": null
           }
         },
         {
@@ -85,7 +85,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "source L3 sol çap"
+            "pathName": null
           }
         },
         {

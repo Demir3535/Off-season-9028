@@ -27,8 +27,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.AutoGrabAndShoot;
 import frc.robot.commands.AutoIntakeCommand;
+import frc.robot.commands.AutoPositionAndShoot;
 import frc.robot.commands.AutoShootCommand;
+import frc.robot.commands.AutoShootFromStart;
+import frc.robot.commands.AutoShootSequence;
+import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.RobotSystemsCheckCommand;
 import frc.robot.commands.drive.TeleopDriveCommand;
 import frc.robot.commands.elevator.MoveElevatorManual;
@@ -44,6 +49,7 @@ import frc.robot.RobotConstants.WristConstants;
 import frc.robot.automation.AutomatedScoring;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.commands.drive.LimelightDriveCommand;
+import frc.robot.commands.IntakeCoral;;
 //Subsystem imports
 //Command imports
 
@@ -94,33 +100,46 @@ public class RobotContainer {
                 SmartDashboard.putNumber("Match Time", matchTime);
         }
 
-        private void createNamedCommands() {
-                // Add commands here to be able to execute in auto through pathplanner
+        // RobotContainer.java içindeki createNamedCommands() metoduna eklenecek
+private void createNamedCommands() {
+    // Mevcut kodlar burada...
+    
+    // Sadece atış yapan komutlar
+    NamedCommands.registerCommand("AutoShootL1", 
+        new AutoShootSequence(shooterSubsystem, elevatorSubsystem, wristSubsystem, 1));
+    NamedCommands.registerCommand("AutoShootL2", 
+        new AutoShootSequence(shooterSubsystem, elevatorSubsystem, wristSubsystem, 2));
+    NamedCommands.registerCommand("AutoShootL3", 
+        new AutoShootSequence(shooterSubsystem, elevatorSubsystem, wristSubsystem, 3));
 
-                NamedCommands.registerCommand("Example", new RunCommand(() -> {
-                        System.out.println("Running...");
-                }));
-                NamedCommands.registerCommand("Score L1",
-                                AutomatedScoring.scoreCoralNoPathing(1, elevatorSubsystem, wristSubsystem));
-                NamedCommands.registerCommand("Score L2",
-                                AutomatedScoring.scoreCoralNoPathing(2, elevatorSubsystem, wristSubsystem));
-                NamedCommands.registerCommand("Score L3",
-                                AutomatedScoring.scoreCoralNoPathing(3, elevatorSubsystem, wristSubsystem));
-                NamedCommands.registerCommand("CoralIn", shooterSubsystem.intakeCoral());
-                NamedCommands.registerCommand("CoralOut", shooterSubsystem.shootCoral());
-                NamedCommands.registerCommand("ProcessorHome",
-                                AutomatedScoring.homeSubsystems(elevatorSubsystem, wristSubsystem));
-                NamedCommands.registerCommand("StopShooter", shooterSubsystem.PPstopshooter());
-                NamedCommands.registerCommand("Wrist Shooter",
-                                AutomatedScoring.scoreWristCoralPathing(2, wristSubsystem));
-                NamedCommands.registerCommand("Wrist Home", AutomatedScoring.scoreWristCoralPathing(0, wristSubsystem));
+    // Başlangıçta coral'ı içeri alıp sonra atış yapan komutlar
+    NamedCommands.registerCommand("AutoShootFromStartL1", 
+        new AutoShootFromStart(shooterSubsystem, elevatorSubsystem, wristSubsystem, 1));
+    NamedCommands.registerCommand("AutoShootFromStartL2", 
+        new AutoShootFromStart(shooterSubsystem, elevatorSubsystem, wristSubsystem, 2));
+    NamedCommands.registerCommand("AutoShootFromStartL3", 
+        new AutoShootFromStart(shooterSubsystem, elevatorSubsystem, wristSubsystem, 3));
 
-                NamedCommands.registerCommand("AutoShoot",
-                                new AutoShootCommand(shooterSubsystem, 1.0, 2.0)); // 1.0 hızda, 2 saniye süreyle atış
-                NamedCommands.registerCommand("AutoIntake",
-                                new AutoIntakeCommand(shooterSubsystem, 0.25, 3.0));
-               
-        }
+    // AprilTag'e göre hizalanıp atış yapan komutlar
+    NamedCommands.registerCommand("PositionAndShootL1", 
+        new AutoPositionAndShoot(limelightSubsystem, m_drive, shooterSubsystem, elevatorSubsystem, wristSubsystem, 1, -1));
+    NamedCommands.registerCommand("PositionAndShootL2", 
+        new AutoPositionAndShoot(limelightSubsystem, m_drive, shooterSubsystem, elevatorSubsystem, wristSubsystem, 2, -1));
+    NamedCommands.registerCommand("PositionAndShootL3", 
+        new AutoPositionAndShoot(limelightSubsystem, m_drive, shooterSubsystem, elevatorSubsystem, wristSubsystem, 3, -1));
+
+    // Gamepiece alıp sonra atış yapan komutlar
+    NamedCommands.registerCommand("AutoGrabAndShootL1", 
+        new AutoGrabAndShoot(shooterSubsystem, elevatorSubsystem, wristSubsystem, 1));
+    NamedCommands.registerCommand("AutoGrabAndShootL2", 
+        new AutoGrabAndShoot(shooterSubsystem, elevatorSubsystem, wristSubsystem, 2));
+    NamedCommands.registerCommand("AutoGrabAndShootL3", 
+        new AutoGrabAndShoot(shooterSubsystem, elevatorSubsystem, wristSubsystem, 3));
+    
+    // Intake komutu
+    NamedCommands.registerCommand("IntakeCoral", 
+        new IntakeCoral(shooterSubsystem));
+}
 
         private void configureButtonBindings() {
 
