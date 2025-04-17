@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotConstants.PortConstants.CAN;
+import frc.robot.RobotConstants.WristConstants;
 import frc.robot.subsystems.ElevatorWristSim;
 import frc.robot.RobotConstants.ElevatorConstants;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -106,7 +107,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (RobotBase.isReal()) {
                 if (level == 1) {
                     setpoint = ElevatorConstants.HeightSetpoints.Coral.L1;
-                } else if (level == 2) {
+                } if (level == 0){
+                    setpoint =  WristConstants.AngleSetpoints.HOME;
+                }else if (level == 2) {
                     setpoint = ElevatorConstants.HeightSetpoints.Coral.L2;
                 } else if (level == 3) {
                     setpoint = ElevatorConstants.HeightSetpoints.Coral.L3;

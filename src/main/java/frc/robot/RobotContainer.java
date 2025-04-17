@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AutoIntakeCommand;
 import frc.robot.commands.AutoShootCommand;
-import frc.robot.commands.IntakeShootCoral;
 import frc.robot.commands.RobotSystemsCheckCommand;
 import frc.robot.commands.drive.TeleopDriveCommand;
 import frc.robot.commands.elevator.MoveElevatorManual;
@@ -54,7 +53,7 @@ public class RobotContainer {
         public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
         public final WristSubsystem wristSubsystem = new WristSubsystem();
         public static LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
-        public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+        public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(wristSubsystem, elevatorSubsystem);
         public final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
         private final Joystick driveJoystick = new Joystick(RobotConstants.PortConstants.Controller.DRIVE_JOYSTICK);
         private final Joystick operatorJoystick = new Joystick(
@@ -120,14 +119,7 @@ public class RobotContainer {
                                 new AutoShootCommand(shooterSubsystem, 1.0, 2.0)); // 1.0 hızda, 2 saniye süreyle atış
                 NamedCommands.registerCommand("AutoIntake",
                                 new AutoIntakeCommand(shooterSubsystem, 0.25, 3.0));
-                NamedCommands.registerCommand("test",
-                                new SequentialCommandGroup(
-                                                new IntakeShootCoral(shooterSubsystem, true),
-                                                AutomatedScoring.scoreWristCoralPathing(2, wristSubsystem),
-                                                AutomatedScoring.scoreCoralNoPathing(2, elevatorSubsystem,
-                                                                wristSubsystem),
-                                                new IntakeShootCoral(shooterSubsystem, true)));
-
+               
         }
 
         private void configureButtonBindings() {

@@ -6,11 +6,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotConstants.PortConstants.CAN;
 import frc.robot.RobotConstants.PortConstants.DIO;
+import frc.robot.RobotConstants.WristConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.PWM;
+import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;;
 
 public class ShooterSubsystem extends SubsystemBase {
     private SparkMax shooterMotor;
@@ -22,17 +27,35 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double GREEN = -0.05;
     public boolean isShooting = false;
     public boolean readyToShoot = false; // Is game piece ready?
-
-    public ShooterSubsystem() {
+    private boolean wasGameElementDetected = false; // Önceki durumu takip etmek için
+    private WristSubsystem wristSubsystem;
+    private ElevatorSubsystem elevatorSubsystem;
+    
+    
+    public ShooterSubsystem(WristSubsystem wristSubsystem, ElevatorSubsystem elevatorSubsystem) {
         limitSwitch = new DigitalInput(DIO.SHOOTER_DISTANCE_SENSOR);
         shooterMotor = new SparkMax(CAN.SHOOTER_MOTOR_1, MotorType.kBrushless);
         blinkinController = new PWM(0);
+           this.wristSubsystem = wristSubsystem;
+    this.elevatorSubsystem = elevatorSubsystem;
     }
 
     @Override
     public void periodic() {
         // Check limit switch status
         gameElementDetected = limitSwitch.get();
+        if (gameElementDetected && !wasGameElementDetected) {
+            // Game piece yeni tespit edildi, wrist'i pozisyona getir
+            wristSubsystem.goToSetpoint(WristConstants.AngleSetpoints.Coral.L3);
+        }
+
+        // Game element atıldıktan sonra (yani gameElementDetected false olduğunda)
+        if (!gameElementDetected && wasGameElementDetected) {
+            // Game piece artık yok, önce elevator sonra wrist home pozisyonuna gelsin
+            autoReturnToHomePosition();
+        }
+
+        wasGameElementDetected = gameElementDetected;
 
         // If game piece is detected and motor is in intake mode, stop the motor
         if (isShooting && !gameElementDetected) {
@@ -55,13 +78,23 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Game Element Detected", gameElementDetected);
         SmartDashboard.putBoolean("Ready To Shoot", readyToShoot);
     }
+private void autoReturnToHomePosition() {
+    // SequentialCommandGroup oluştur ve çalıştır
+    new SequentialCommandGroup(
+        // Önce elevator'un home pozisyonuna inmesini bekle
+        elevatorSubsystem.goToCoralScoreSetpoint(0), // 0 = Home pozisyonu
+        // Sonra wrist'in home pozisyonuna gelmesini sağla
+      new WaitUntilCommand(wristSubsystem::atSetpoint),
 
+        wristSubsystem.goToCoralScoreSetpoint(0)     // 0 = Home pozisyonu
+    ).schedule();
+}
     private void updateLEDStatus() {
         if (readyToShoot) {
             blinkinController.setSpeed(GREEN); // Yeşil renk
         } else if (!gameElementDetected) {
             blinkinController.setSpeed(RED); // Kırmızı renk
-        } 
+        }
     }
 
     public void shooterButton() {
@@ -84,14 +117,11 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-   
-
     public Command ShootAuto() {
         return new InstantCommand(() -> {
             moveAtSpeed(1);
         }, this);
     }
-
 
     public void reverseShooter() {
         SmartDashboard.putBoolean("Reverse Button Pressed", true);
@@ -120,6 +150,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterMotor.set(speed);
         isShooterRunning = true;
     }
+
     public Command intakeCoral() {
         return new InstantCommand(() -> {
             moveAtSpeed(.5);
@@ -131,6 +162,7 @@ public class ShooterSubsystem extends SubsystemBase {
             moveAtSpeed(1);
         }, this);
     }
+
     public void stopShooter() {
         shooterMotor.set(0);
         isShooterRunning = false;

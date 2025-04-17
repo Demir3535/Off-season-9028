@@ -105,7 +105,9 @@ private static WristSubsystem instance;
             if (RobotBase.isReal()) {
                 if (level == 1) {
                     setpoint = WristConstants.AngleSetpoints.Coral.L1;
-                } else if (level == 2) {
+                } if (level == 0){
+                    setpoint =  WristConstants.AngleSetpoints.HOME;
+                }else if (level == 2) {
                     setpoint = WristConstants.AngleSetpoints.Coral.L2;
                 } else if (level == 3) {
                     setpoint = WristConstants.AngleSetpoints.Coral.L3;
